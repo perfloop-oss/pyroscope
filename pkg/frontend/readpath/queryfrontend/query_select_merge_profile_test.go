@@ -389,7 +389,7 @@ func TestSelectMergeProfile_TreePath_SendsQueryTreeWithFullSymbols(t *testing.T)
 	require.NoError(t, err)
 	require.NotNil(t, capturedQuery)
 	assert.Equal(t, queryv1.QueryType_QUERY_TREE, capturedQuery.QueryType)
-	assert.True(t, capturedQuery.Tree.GetFullSymbols(), "tree path must request full symbols")
+	assert.Equal(t, queryv1.SymbolMode_SYMBOL_MODE_FULL, capturedQuery.Tree.GetSymbolMode(), "tree path must request full symbols")
 }
 
 func TestSelectMergeProfile_TreePath_OtherLocationRef(t *testing.T) {

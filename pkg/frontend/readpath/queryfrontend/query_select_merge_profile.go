@@ -142,7 +142,7 @@ func (q *QueryFrontend) selectMergeProfileTree(
 					StackTraceSelector: req.StackTraceSelector,
 					ProfileIdSelector:  req.ProfileIdSelector,
 					TraceIdSelector:    req.TraceIdSelector,
-					FullSymbols:        true,
+					SymbolMode:         queryv1.SymbolMode_SYMBOL_MODE_FULL,
 				},
 			}},
 		},
