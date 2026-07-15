@@ -537,6 +537,7 @@ func (m *TreeQuery) CloneVT() *TreeQuery {
 	r.MaxNodes = m.MaxNodes
 	r.FullSymbols = m.FullSymbols
 	r.SymbolMode = m.SymbolMode
+	r.MaxUnresolvedLocations = m.MaxUnresolvedLocations
 	if rhs := m.SpanSelector; rhs != nil {
 		tmpContainer := make([]string, len(rhs))
 		copy(tmpContainer, rhs)
@@ -1794,6 +1795,9 @@ func (this *TreeQuery) EqualVT(that *TreeQuery) bool {
 		}
 	}
 	if this.SymbolMode != that.SymbolMode {
+		return false
+	}
+	if this.MaxUnresolvedLocations != that.MaxUnresolvedLocations {
 		return false
 	}
 	return string(this.unknownFields) == string(that.unknownFields)
@@ -3996,6 +4000,11 @@ func (m *TreeQuery) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaxUnresolvedLocations != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.MaxUnresolvedLocations))
+		i--
+		dAtA[i] = 0x40
+	}
 	if m.SymbolMode != 0 {
 		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.SymbolMode))
 		i--
@@ -5738,6 +5747,9 @@ func (m *TreeQuery) SizeVT() (n int) {
 	}
 	if m.SymbolMode != 0 {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.SymbolMode))
+	}
+	if m.MaxUnresolvedLocations != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.MaxUnresolvedLocations))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -9615,6 +9627,25 @@ func (m *TreeQuery) UnmarshalVT(dAtA []byte) error {
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.SymbolMode |= SymbolMode(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxUnresolvedLocations", wireType)
+			}
+			m.MaxUnresolvedLocations = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protohelpers.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxUnresolvedLocations |= int64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
