@@ -43,6 +43,13 @@ func (q *QueryFrontend) SelectMergeSpanProfile(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	useSymbolRefs := q.useSymbolRefTrees(tenantIDs)
+	treeQuery := &queryv1.TreeQuery{
+		MaxNodes:     maxNodes,
+		SpanSelector: c.Msg.SpanSelector,
+	}
+	if useSymbolRefs {
+		q.symbolRefTreeQuery(treeQuery, tenantIDs)
+	}
 	report, err := q.querySingle(ctx,
 		&queryv1.QueryRequest{
 			StartTime:     c.Msg.Start,
@@ -50,11 +57,7 @@ func (q *QueryFrontend) SelectMergeSpanProfile(
 			LabelSelector: labelSelector,
 			Query: []*queryv1.Query{{
 				QueryType: queryv1.QueryType_QUERY_TREE,
-				Tree: &queryv1.TreeQuery{
-					MaxNodes:     maxNodes,
-					SpanSelector: c.Msg.SpanSelector,
-					SymbolRefs:   useSymbolRefs,
-				},
+				Tree:      treeQuery,
 			}},
 		},
 		func(ctx context.Context, upstream QueryBackend, blocks []*metastorev1.BlockMeta) QueryBackend {

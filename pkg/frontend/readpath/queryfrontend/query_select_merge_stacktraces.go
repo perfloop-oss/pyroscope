@@ -113,6 +113,15 @@ func (q *QueryFrontend) selectMergeStacktracesTree(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	useSymbolRefs := q.useSymbolRefTrees(tenantIDs)
+	treeQuery := &queryv1.TreeQuery{
+		MaxNodes:           maxNodes,
+		StackTraceSelector: c.Msg.StackTraceSelector,
+		ProfileIdSelector:  c.Msg.ProfileIdSelector,
+		TraceIdSelector:    c.Msg.TraceIdSelector,
+	}
+	if useSymbolRefs {
+		q.symbolRefTreeQuery(treeQuery, tenantIDs)
+	}
 	report, err := q.querySingle(ctx,
 		&queryv1.QueryRequest{
 			StartTime:     c.Msg.Start,
@@ -120,13 +129,7 @@ func (q *QueryFrontend) selectMergeStacktracesTree(
 			LabelSelector: labelSelector,
 			Query: []*queryv1.Query{{
 				QueryType: queryv1.QueryType_QUERY_TREE,
-				Tree: &queryv1.TreeQuery{
-					MaxNodes:           maxNodes,
-					StackTraceSelector: c.Msg.StackTraceSelector,
-					ProfileIdSelector:  c.Msg.ProfileIdSelector,
-					TraceIdSelector:    c.Msg.TraceIdSelector,
-					SymbolRefs:         useSymbolRefs,
-				},
+				Tree:      treeQuery,
 			}},
 		},
 		func(ctx context.Context, upstream QueryBackend, blocks []*metastorev1.BlockMeta) QueryBackend {
